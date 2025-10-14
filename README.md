@@ -7,7 +7,7 @@ $$
 \beta R(x, t) H(x) u,
 $$
 
-gdzie:
+where:
 
 - $R(x, t)$ - radiation dose distribution
 - $H(x)$ - hypoxia function
