@@ -50,7 +50,7 @@ class Beam:
 
 @dataclass
 class VizConfig:
-    frame_every: int = 5             # save a frame every N steps
+    frame_every: int = 5
     cmap: str = "viridis"
 
 @dataclass

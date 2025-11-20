@@ -209,3 +209,4 @@ __marimo__/
 # results file
 radiation_model/results/
 good_evil_model/
+text_generation_analysis/

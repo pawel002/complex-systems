@@ -54,6 +54,7 @@ def simulate(cfg: SimConfig, save_hook=None) -> SimOutput:
     def in_window(t: float) -> bool:
         return np.any((t >= fr_t) & (t < fr_end))
 
+    max_u = np.max(u)
     for k, t in enumerate(times):
         Lu = laplacian_neumann(u, g.dx)
         growth = kin.rho_per_day * u * (1.0 - u/kin.K)
@@ -84,7 +85,7 @@ def simulate(cfg: SimConfig, save_hook=None) -> SimOutput:
         total_mass[k] = u.sum()
 
         if save_hook is not None:
-            save_hook(k, t, u, times[:k+1], total_mass[:k+1], dose_rate_series[:k+1], beam)
+            save_hook(k, t, u, times[:k+1], total_mass[:k+1], dose_rate_series[:k+1], beam, max_u)
 
     return SimOutput(x=x, y=y, times=times, uT=u, pO2=pO2, H=H, beam=beam,
                      total_mass=total_mass, dose_rate_series=dose_rate_series)

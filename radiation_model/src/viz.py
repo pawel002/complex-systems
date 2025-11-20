@@ -14,6 +14,7 @@ def make_frame(
     times: Array,
     mass: Array,
     dose_series: Array,
+    max_u: float = 1.0,
     cmap: str = "viridis"
 ) -> str:
     """Create a figure with 3 panels: density image, dose-rate(t), cumulative mass(t)."""
@@ -22,7 +23,7 @@ def make_frame(
 
     # Left: density
     ax0 = fig.add_subplot(1, 3, 1)
-    im = ax0.imshow(u.T, origin="lower", interpolation="nearest", cmap=cmap)
+    im = ax0.imshow(u.T, origin="lower", vmax=max_u, interpolation="nearest", cmap=cmap)
     ax0.set_title(f"Cell density u(x,y)\nDay {t_day:.2f}")
     ax0.set_xticks([]); ax0.set_yticks([])
     cbar = fig.colorbar(im, ax=ax0, fraction=0.046, pad=0.04)

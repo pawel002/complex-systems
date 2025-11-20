@@ -8,7 +8,7 @@ from src.giftools import frames_to_gif
 def main() -> None:
     ap = argparse.ArgumentParser(description="RT + hypoxia RD simulator (2-D)")
     ap.add_argument("--mode", choices=["pde_kill", "lq_pulses"], default="lq_pulses")
-    ap.add_argument("--out", default="out")
+    ap.add_argument("--out", default="out1")
     ap.add_argument("--T", type=float, default=60.0)
     ap.add_argument("--dt", type=float, default=0.05)
     ap.add_argument("--N", type=int, default=100)
@@ -43,9 +43,9 @@ def main() -> None:
         viz=VizConfig(frame_every=args.frame_every),
     )
 
-    def hook(k, t, u, times, mass, dr, beam):
+    def hook(k, t, u, times, mass, dr, beam, max_u):
         if k % cfg.viz.frame_every == 0:
-            make_frame(frames_dir, k, t, u, times, mass, dr, cmap=cfg.viz.cmap)
+            make_frame(frames_dir, k, t, u, times, mass, dr, max_u, cmap=cfg.viz.cmap)
 
     print("Running simulation...")
     simulate(cfg, save_hook=hook)
