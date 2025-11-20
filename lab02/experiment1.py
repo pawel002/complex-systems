@@ -12,7 +12,7 @@ rho = 0.3     # logistic growth rate
 beta = 1.0    # radiosensitivity
 K = 1.0
 
-# Hypoxia/oxygenation profile H(x): better oxygenation near x ~ 0.3
+# Hypoxia/oxygenation profile H(x): better oxygenation near x ~ 0.5
 H_vec = 0.4 + 0.6 * np.exp(-((x - 0.5 * L)/0.5) ** 2)
 H_eff = np.mean(H_vec)
 

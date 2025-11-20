@@ -23,7 +23,7 @@ K = 1.0           # carrying capacity
 # ------------------------------------------------------------
 # Hypoxia profile H(x) (fixed for all scenarios)
 # ------------------------------------------------------------
-# Better oxygenation near x ~ 0.3
+# Better oxygenation near x ~ 0.5
 H_vec = 0.4 + 0.6 * np.exp(-((x - 0.5 * L) / 0.5) ** 2)
 
 # ============================================================
@@ -31,13 +31,6 @@ H_vec = 0.4 + 0.6 * np.exp(-((x - 0.5 * L) / 0.5) ** 2)
 # ============================================================
 
 def dose_rate_time(t):
-    """
-    Fractionated radiotherapy schedule:
-    - 3 courses
-    - each course has 5 daily fractions
-    - each fraction lasts 0.2 time units
-    - courses start at t = 5, 15, 25
-    """
     dose_amp = 4.0
     fraction_duration = 0.2
     course_starts = [5.0, 15.0, 25.0]
@@ -55,9 +48,6 @@ def dose_rate_time(t):
 # ============================================================
 
 def initial_condition(kind, x):
-    """
-    Return non-uniform initial tumor density u0(x) in [0,1].
-    """
     if kind == "left_peak":
         u0 = 0.1 + 0.5 * np.exp(-((x - 0.2) / 0.1) ** 2)
     elif kind == "center_peak":
@@ -79,10 +69,6 @@ def initial_condition(kind, x):
 
 
 def dose_profile(kind, x):
-    """
-    Return spatial weight W(x) for the dose R(x,t) = r(t)*W(x).
-    W(x) ∈ [0,1] describes how much of the beam hits each location.
-    """
     if kind == "uniform":
         W = np.ones_like(x)
     elif kind == "left_focus":
@@ -103,21 +89,6 @@ def dose_profile(kind, x):
 # ============================================================
 
 def run_simulation(D, rho, beta, u0, W):
-    """
-    Run one simulation of the PDE and its ODE surrogate.
-
-    PDE:  du/dt = D u_xx + rho u(1-u/K) - beta R(x,t) H(x) u
-    ODE:  dU/dt = rho U(1-U/K) - beta r(t) <W*H> U
-
-    where R(x,t) = r(t) * W(x) and < · > denotes spatial average.
-
-    Returns
-    -------
-    times      : (NSTEPS+1,) array
-    mass_pde   : (NSTEPS+1,) array, integral of u(x,t) over space
-    mass_ode   : (NSTEPS+1,) array, same quantity from ODE surrogate
-    """
-
     # Precompute constants
     WH_mean = np.mean(W * H_vec)  # <W*H>
 
