@@ -1,3 +1,5 @@
+### Lab 1 - Simple solver
+
 Radiotherapy – a model of hypoxia and the radiation effect. Baseline model:
 
 $$
