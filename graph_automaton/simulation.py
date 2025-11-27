@@ -5,6 +5,8 @@ import shutil
 from scipy import sparse
 from typing import List, Literal
 
+from tqdm import trange
+
 def simulate(
     adj: List[List[int]],
     coords: np.ndarray,
@@ -12,18 +14,21 @@ def simulate(
     m: float,
     plot_every: int = 5,
     values_init: Literal["uniform", "random"] = "uniform",
+    title: str = "Title",
     output_folder: str = "frames",
-    linearize: float = 0
-):
+    linearize: float = 0,
+    aggregate: int = 0,
+    verbose: bool = False
+) -> List[float]:
     
-    # --- 1. Setup Output Folder ---
-    if os.path.exists(output_folder):
-        shutil.rmtree(output_folder)
-    os.makedirs(output_folder)
-    print(f"Output folder '{output_folder}' created/cleared.")
+    if plot_every > 0: 
+        if os.path.exists(output_folder):
+            shutil.rmtree(output_folder)
+        os.makedirs(output_folder)
+        if verbose:
+            print(f"Output folder '{output_folder}' created/cleared.")
     n = len(adj)
     
-    # --- 2. Build Sparse Matrix ---
     data = []
     rows = []
     cols = []
@@ -39,22 +44,22 @@ def simulate(
             
     adj_matrix = sparse.csr_matrix((data, (rows, cols)), shape=(n, n))
 
-    # --- 3. Initialization ---
     if values_init == "uniform":
-        # Random values strictly between 0 and 1
         x = np.random.uniform(0.01, 0.99, n)
     elif values_init == "random":
-        # Alternative: Start with binary random state or Gaussian
         x = np.random.rand(n)
-        
-    print(f"Simulation started for N={n} nodes, T={steps} steps, m={m}")
     
-    # Lists to store history for ax3
+    total_duration = steps + aggregate
+    if verbose:
+        print(f"Simulation started for N={n} nodes, T={total_duration} steps (Burn-in: {steps}, Agg: {aggregate}), m={m}")
+    
     history_avg = []
     history_t = []
+    
+    aggregated_results = []
 
-    # --- 4. Main Loop ---
-    for t in range(steps):
+    iterator = trange(total_duration) if verbose else range(total_duration)
+    for t in iterator:
         
         neighbor_sums = adj_matrix.dot(x)
         
@@ -72,20 +77,20 @@ def simulate(
         history_avg.append(current_mean)
         history_t.append(t)
         
-        # --- 5. Visualization ---
-        if t % plot_every == 0:
-            # Changed to 1 row, 3 columns, and increased width
+        if aggregate > 0 and t >= steps:
+            aggregated_results.append(current_mean)
+        
+        if plot_every > 0 and t % plot_every == 0:
             fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(20, 6))
+            fig.suptitle(title, fontsize=16)
             
-            # ax1: Graph State Scatter
             sc = ax1.scatter(coords[:, 0], coords[:, 1], c=x, cmap='coolwarm', 
                              s=15, alpha=0.8, vmin=0, vmax=1)
             ax1.set_title(f"Graph State (t={t})")
             ax1.axis('off')
             plt.colorbar(sc, ax=ax1, label="Value $x_i$")
 
-            # ax2: Distribution Histogram
-            mean_val = current_mean # Use the value calculated above
+            mean_val = current_mean 
             std_val = np.std(x)
             
             ax2.hist(x, bins=50, range=(0, 1), color='gray', alpha=0.7, density=True)
@@ -100,18 +105,26 @@ def simulate(
             ax2.set_ylim(0, 10)
             ax2.legend(loc='upper right')
 
-            # ax3: Average Value History (Scatter)
             ax3.scatter(history_t, history_avg, c='blue', s=5, alpha=0.6)
+            
+            if aggregate > 0:
+                ax3.axvline(steps, color='green', linestyle='--', alpha=0.5, label='Agg Start')
+                if t > steps:
+                    ax3.axvspan(steps, total_duration, color='green', alpha=0.1)
+
             ax3.set_title("Evolution of Average Value")
             ax3.set_xlabel("Time Step (t)")
             ax3.set_ylabel("Mean $x_i$")
-            ax3.set_xlim(0, steps) # Fix x-axis to total steps
-            ax3.set_ylim(0, 1)     # Fix y-axis to possible range
+            ax3.set_xlim(0, total_duration)
+            ax3.set_ylim(0, 1)     
             ax3.grid(True, linestyle=':', alpha=0.6)
 
             filename = os.path.join(output_folder, f"frame_{t:04d}.png")
             plt.tight_layout()
             plt.savefig(filename, dpi=100)
             plt.close(fig)
-            
-    print(f"Simulation complete. Frames saved to /{output_folder}")
+
+    if plot_every > 0 and verbose:   
+        print(f"Simulation complete. Frames saved to /{output_folder}")
+    
+    return aggregated_results
