@@ -36,7 +36,7 @@ $$
     \frac{\text{d}U}{\text{d}t} = \rho U(1-U) - \beta H_{\text{eff}} r(t) U.
 $$
 
-We need to calculate the initial condition for the ODE model as $U(0) = \frac{1}{L} \int_0^L u_0(x) \text{d}x$.
+We need to calculate the initial condition for the ODE model as $U(0) = \frac{1}{L} \int_0^L u(x, 0) \text{d}x$.
 
 ### Numerical comparison
 
@@ -106,4 +106,3 @@ $$
 $$
 
 instead of the current $U_n \rightarrow U_{n+1}$ approximation.
-
