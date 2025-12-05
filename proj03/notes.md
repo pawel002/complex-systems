@@ -27,6 +27,12 @@ We performed 2D simulations in full spatial and temporal domains. Below are exam
 
 ### Sensitivity Analysis
 
+First analysis was performed using Morris and Sobol method.
+
+![](figures/sensitivity_dark_mode.png)
+
+We see that the diffusion coeffiecient has little influence on the final outcome. Expectedly, $\rho$ - the regenaration speed of the tumor was the most influential parameter.
+
 We decided to investigate model behavior by performing a grid search over the parameter space in the form of 2D heatmaps, where the value at point $(x, y)$ represents the cumulative mass of the tumor at the end of the simulation. We also defined a secondary metric called **damage to healthy cells**. By "healthy cells," we mean points where the value of $u$ is close to $0$. We defined it as follows:
 
 $$
