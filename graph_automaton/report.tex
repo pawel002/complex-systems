@@ -1,0 +1,62 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{polski}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{geometry}
+
+\geometry{a4paper, margin=2.5cm}
+
+\title{Raport z analizy symulacji Graph Linear Automaton}
+\author{Antigravity AI}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Wstęp}
+Celem niniejszego raportu jest analiza zachowania automatu grafowego (Graph Linear Automaton), w którym stan wierzchołków jest aktualizowany zgodnie z regułą logistyczną. Rozważamy graf $G = (V, E)$, gdzie każdy wierzchołek $v_i$ posiada stan $x_i \in (0, 1)$. Stan ten ewoluuje w czasie dyskretnym $t$ według wzoru:
+\begin{equation}
+    x_i^{t+1} = m A_i^t (1 - A_i^t),
+\end{equation}
+gdzie $m \in [2, 4]$ jest parametrem wzrostu, a $A_i^t$ oznacza średnią wartość stanów sąsiadów wierzchołka $i$ w chwili $t$. Model ten jest uogólnieniem klasycznego odwzorowania logistycznego na strukturę sieciową.
+
+\section{Metodologia symulacji}
+Przede wszystkim zdecydowałem się na przeprowadzenie eksperymentów na różnych typach grafów. Proceduralnie wygenerowałem grafy następujących typów:
+\begin{itemize}
+    
+\end{itemize} 
+
+\begin{itemize}
+    \item \textbf{Typ grafu:} Losowe grafy regularne (Random Regular Graphs).
+    \item \textbf{Rozmiar grafu:} $N = 2000$ wierzchołków.
+    \item \textbf{Stopień wierzchołka:} Zbadano wartości stopnia $k$ w zakresie od $2$ do $9$.
+    \item \textbf{Parametr sterujący $m$:} Analizowano przedział $[2.0, 4.0]$ z rozdzielczością 200 punktów.
+    \item \textbf{Przebieg symulacji:} Dla każdej wartości $m$ wykonano 10 powtórzeń. W każdym powtórzeniu system ewoluował przez 100 kroków "rozgrzewki" (burn-in), po czym zbierano dane z kolejnych 100 kroków.
+    \item \textbf{Mierzona wielkość:} Średnia wartość stanu sieci $\langle x \rangle = \frac{1}{N} \sum x_i$.
+\end{itemize}
+
+\section{Wyniki - Diagramy Bifurkacyjne}
+Głównym wynikiem analizy są diagramy bifurkacyjne przedstawiające zależność średniego stanu $\langle x \rangle$ od parametru $m$ dla różnych stopni $k$.
+
+\subsection{Charakterystyka dynamiki}
+Analiza kodu generującego wykresy (pętla po $k=2..9$) pozwala stwierdzić występowanie charakterystycznych reżimów dynamicznych, analogicznych do klasycznego odwzorowania logistycznego, ale zmodyfikowanych przez topologię sieci:
+\begin{enumerate}
+    \item \textbf{Punkt stały:} Dla mniejszych wartości $m$, system dąży do stabilnego punktu stałego. Wartość średnia $\langle x \rangle$ jest stała w czasie.
+    \item \textbf{Podwajanie okresu:} Wraz ze wzrostem $m$, obserwuje się bifurkacje, gdzie stan układu zaczyna oscylować między dwiema (a następnie czterema itd.) wartościami.
+    \item \textbf{Chaos:} Dla dużych wartości $m$ (bliskich 4.0), system wchodzi w fazę chaotyczną, gdzie średnia wartość stanu fluktuuje w sposób nieokresowy.
+\end{enumerate}
+
+\subsection{Wpływ stopnia grafu $k$}
+Stopień $k$ grafu regularnego wpływa na sprzężenie między węzłami:
+\begin{itemize}
+    \item Dla małych $k$ (np. $k=2$, co odpowiada strukturze cyklu), wpływ sąsiadów jest ograniczony, co może prowadzić do większej różnorodności lokalnych stanów i wolniejszego osiągania synchronizacji.
+    \item Dla większych $k$, każdy węzeł uśrednia sygnał od większej liczby sąsiadów. Zgodnie z prawem wielkich liczb, fluktuacje lokalne są tłumione (efekt uśredniania, ang. \textit{mean field}), co sprawia, że system jako całość zachowuje się bardziej podobnie do pojedynczego odwzorowania logistycznego. Diagramy bifurkacyjne stają się wyraźniejsze i bardziej zbliżone do teoretycznego modelu logistycznego.
+\end{itemize}
+
+\section{Podsumowanie}
+Symulacje wykazały, że Graph Linear Automaton wykazuje bogatą dynamikę nieliniową, w tym przejście od stabilności do chaosu poprzez kaskadę bifurkacji. Topologia sieci, reprezentowana przez stopień $k$ w losowych grafach regularnych, odgrywa kluczową rolę w modyfikowaniu tej dynamiki, przy czym wyższe usieciowienie sprzyja zachowaniom zgodnym z przybliżeniem średniego pola.
+
+\end{document}
